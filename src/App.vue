@@ -10,14 +10,19 @@ watch(username, (name) => {
   localStorage.setItem('username', name)
 })
 
-watch(todos, (todo) => {
-  localStorage.setItem('todos', JSON.stringify(todo))
-}, {deep: true})
+watch(todos, (t) => {
+  localStorage.setItem('todos', JSON.stringify(t))
+})
+
 
 onMounted(() => {
-  username.value = localStorage.getItem('username') || ''
-  todos.value = JSON.parse(localStorage.getItem('todos')) || []
-})
+  try {
+    username.value = localStorage.getItem('username') || '';
+    todos.value = JSON.parse(localStorage.getItem('todos')) || [];
+  } catch (e) {
+    todos.value = [];
+  }
+});
 
 const addTodo = () => {
   if (inputContent.value.trim() === '') {
@@ -25,17 +30,20 @@ const addTodo = () => {
   }
 
   todos.value.unshift({
+    id: new Date().getTime(),
     content: inputContent.value,
     done: false,
-    createdAt: new Date().getTime()
   })
 
   inputContent.value = ''
 }
 
 const removeTodo = (todo) => {
-  todos.value = todos.value.filter( t => t !== todo)
+  todos.value = todos.value.filter( t => t.id !== todo)
 }
+
+const hasTodos = computed(() => filteredData.value.length > 0)
+
 
 const filteredData = computed(() => {
   switch (filter.value) {
@@ -80,13 +88,13 @@ const filteredData = computed(() => {
       <div class="">
         <ul>
           <li class="mb-2">Your Tasks</li>
-          <li class="border border-dashed rounded p-2 text-center" v-if="filteredData.length === 0">No Tasks</li>
+          <li class="border border-dashed rounded p-2 text-center" v-if="!hasTodos">No Tasks</li>
           <li v-for="todo in filteredData" :key="todo.createdAt" class="flex justify-between items-center gap-2 border border-dashed rounded p-2 mb-4">
             <div class="flex gap-2 items-center">
               <input type="checkbox" v-model="todo.done" name="" id="">
               <span class="block" :class="todo.done ? 'line-through text-gray-400' : ''">{{ todo.content }}</span>
             </div>
-            <button class="bg-red-500 text-white py-1 px-2 rounded" @click="removeTodo(todo)">Delete</button>
+            <button class="bg-red-500 text-white py-1 px-2 rounded" @click="removeTodo(todo.id)">Delete</button>
           </li>
         </ul>
       </div>
