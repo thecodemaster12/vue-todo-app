@@ -63,7 +63,7 @@ const filteredData = computed(() => {
 <template>
 <div class="container mx-auto">
   <div class="min-h-screen flex justify-center items-center">
-    <div class="border-2 shadow-md shadow-black p-16">
+    <div class="border-2 shadow-md shadow-black p-16 rounded-md">
       <div class="text-center border-b pb-2 mb-4">
         <h1 class="text-2xl">Welcome, 
           <input v-model="username" class="outline-0" type="text" placeholder="Name...">
